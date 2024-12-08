@@ -85,44 +85,25 @@ public final class Main {
             CommandInput command = inputData.getCommands()[i];
             int timestamp = command.getTimestamp();
 
-            if (command.getCommand().equals("printUsers"))
-                out.printUsers(bank, timestamp);
-            if (command.getCommand().equals("addAccount"))
-                bank.addAccount(command);
-            if (command.getCommand().equals("createCard"))
-                bank.createCard(command, "permanent");
-            if (command.getCommand().equals("createOneTimeCard"))
-                bank.createCard(command, "oneTime");
-            if (command.getCommand().equals("addFunds"))
-                bank.addFounds(command);
-            if (command.getCommand().equals("deleteAccount")) {
-                if (bank.deleteAccount(command) == 1)
-                    out.deleteAccount(command.getTimestamp());
-            }
-            if (command.getCommand().equals("deleteCard")) {
-                bank.deleteCard(command);
+            switch (command.getCommand()) {
+                case "printUsers" -> out.printUsers(bank, timestamp);
+                case "addAccount" -> bank.addAccount(command);
+                case "createCard" -> bank.createCard(command, "permanent");
+                case "createOneTimeCard" -> bank.createCard(command, "oneTime");
+                case "addFunds" -> bank.addFounds(command);
+                case "deleteAccount" -> {
+                    if (bank.deleteAccount(command) == 1)
+                        out.deleteAccount(command.getTimestamp());
+                }
+                case "deleteCard" -> bank.deleteCard(command);
+                case "payOnline" -> {
+                    if (bank.payOnline(command) == 2)
+                        out.cardNotFound(timestamp);
+                }
+                case "sendMoney" -> bank.sendMoney(command);
             }
         }
         Utils.resetRandom();
-
-        /*
-         * TODO Implement your function here
-         *
-         * How to add output to the output array?
-         * There are multiple ways to do this, here is one example:
-         *
-         * ObjectMapper mapper = new ObjectMapper();
-         *
-         * ObjectNode objectNode = mapper.createObjectNode();
-         * objectNode.put("field_name", "field_value");
-         *
-         * ArrayNode arrayNode = mapper.createArrayNode();
-         * arrayNode.add(objectNode);
-         *
-         * output.add(arrayNode);
-         * output.add(objectNode);
-         *
-         */
 
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
         objectWriter.writeValue(new File(filePath2), output);

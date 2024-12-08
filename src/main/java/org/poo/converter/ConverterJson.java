@@ -74,4 +74,19 @@ public class ConverterJson {
         txt.put("timestamp", timestamp);
         out.add(txt);
     }
+
+    public void cardNotFound(int timestamp){
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode txt = mapper.createObjectNode();
+
+        txt.put("command", "payOnline");
+
+        ObjectNode txt2 = mapper.createObjectNode();
+        txt2.put("timestamp", timestamp);
+        txt2.put("description", "Card not found");
+
+        txt.set("output", txt2);
+        txt.put("timestamp", timestamp);
+        out.add(txt);
+    }
 }
