@@ -1,6 +1,10 @@
 package org.poo.users;
 
+import org.poo.users.transactions.CreateOrDeleteCard;
+import org.poo.users.transactions.Transaction;
 import org.poo.utils.Utils;
+
+import java.util.ArrayList;
 
 public class Card {
     private String status;
@@ -45,5 +49,10 @@ public class Card {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public void addCardCreationTransaction (int timestamp, String email, String iban,
+                                            ArrayList<Transaction> transactions, String description) {
+        transactions.add(new CreateOrDeleteCard(timestamp, email, getCardNumber(), iban, description));
     }
 }

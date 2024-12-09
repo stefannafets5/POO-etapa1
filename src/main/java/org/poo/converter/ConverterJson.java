@@ -89,13 +89,14 @@ public class ConverterJson {
         txt.set("output", txt2);
         txt.put("timestamp", timestamp);
         txt.put("command", "deleteAccount");
+        out.add(txt);
     }
 
-    public void cardNotFound(int timestamp){
+    public void cardNotFound(int timestamp, String command){
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
 
-        txt.put("command", "payOnline");
+        txt.put("command", command);
 
         ObjectNode txt2 = mapper.createObjectNode();
         txt2.put("timestamp", timestamp);

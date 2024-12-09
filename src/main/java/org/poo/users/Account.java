@@ -3,6 +3,8 @@ package org.poo.users;
 import java.util.ArrayList;
 
 import org.poo.fileio.CommandInput;
+import org.poo.users.transactions.CreateOrDeleteCard;
+import org.poo.users.transactions.Transaction;
 import org.poo.utils.Utils;
 
 public class Account {
@@ -11,13 +13,12 @@ public class Account {
     private String iban;
     private String alias;
     private double balance;
-    private int timeOfCreation;
+    private double minBalance;
     private ArrayList<Card> cards = new ArrayList<>();
 
-    public Account(String currency, String type, int timeOfCreation) {
+    public Account(String currency, String type) {
         this.currency = currency;
         this.type = type;
-        this.timeOfCreation = timeOfCreation;
         this.balance = 0;
         this.iban = Utils.generateIBAN();
     }
@@ -62,20 +63,20 @@ public class Account {
         this.currency = currency;
     }
 
-    public int getTimeOfCreation() {
-        return timeOfCreation;
-    }
-
-    public void setTimeOfCreation(int timeOfCreation) {
-        this.timeOfCreation = timeOfCreation;
-    }
-
     public String getAlias() {
         return alias;
     }
 
     public void setAlias(String alias) {
         this.alias = alias;
+    }
+
+    public double getMinBalance() {
+        return minBalance;
+    }
+
+    public void setMinBalance(double minBalance) {
+        this.minBalance = minBalance;
     }
 
     public void addMoney (double amount) {
@@ -86,12 +87,20 @@ public class Account {
         this.balance -= amount;
     }
 
-    public void addCard (CommandInput input, String type){
+    public void addCard (CommandInput input, String type,
+                         ArrayList<Transaction> transactions, String description){
         Card card = new Card(input.getTimestamp(), type);
+
+        card.addCardCreationTransaction(input.getTimestamp(),
+                input.getEmail(), getIban(), transactions, description);
         getCards().add(card);
+
     }
 
-    public void removeCard (int index){
+    public void removeCard (int index, CommandInput input, String email,
+                            ArrayList<Transaction> transactions, String description){
+        getCards().get(index).addCardCreationTransaction(input.getTimestamp(),
+                email, getIban(), transactions, description);
         getCards().remove(index);
     }
 }

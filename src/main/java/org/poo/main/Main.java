@@ -102,10 +102,17 @@ public final class Main {
                 case "sendMoney" -> bank.sendMoney(command);
                 case "payOnline" -> {
                     if (bank.payOnline(command) == 2)
-                        out.cardNotFound(timestamp);
+                        out.cardNotFound(timestamp, "payOnline");
                 }
                 case "setAlias" -> bank.setAlias(command);
                 case "printTransactions" -> bank.printTransactions(command, out);
+                case "setMinimumBalance" -> bank.setMinimumBalance(command);
+                case "checkCardStatus" -> {
+                    if (bank.checkCardStatus(command) == 0)
+                        out.cardNotFound(timestamp, "checkCardStatus");
+                }
+                case "changeInterestRate" -> bank.changeInterestRate(command);
+                case "splitPayment" -> bank.splitPayment(command);
             }
         }
         Utils.resetRandom();

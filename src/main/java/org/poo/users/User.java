@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.poo.converter.ConverterJson;
 import org.poo.fileio.CommandInput;
 import org.poo.users.transactions.*;
+import org.poo.users.transactions.Error;
 
 public class User {
     private String firstName;
@@ -60,18 +61,35 @@ public class User {
     }
 
     public void addAccount (CommandInput input) {
-        Account account = new Account(input.getCurrency(),
-                input.getAccountType(), input.getTimestamp());
-        getAccounts().add(account);
-        addAccountCreationTransaction(input.getTimestamp(), "New account created");
+        if (input.getAccountType().equals("savings")){
+            SavingsAccount account = new SavingsAccount(input.getCurrency(),
+                    input.getAccountType(), input.getInterestRate());
+            getAccounts().add(account);
+        } else {
+            Account account = new Account(input.getCurrency(), input.getAccountType());
+            getAccounts().add(account);
+        }
+        addAccountCreationTransaction(input.getTimestamp());
     }
 
     public void deleteAccount (int index){
         getAccounts().remove(index);
     }
 
-    public void addAccountCreationTransaction (int timestamp, String description) {
-        getTransactions().add(new CreateAccount(timestamp, description));
+    public void addErrorTransaction (int timestamp, String description) {
+        getTransactions().add(new Error(timestamp, description));
+    }
+
+    public void addAccountCreationTransaction (int timestamp) {
+        getTransactions().add(new CreateAccount(timestamp));
+    }
+
+    public void addCardPaymentTransaction (int timestamp, double amount, String commerciant) {
+        getTransactions().add(new CardPayment(timestamp, amount, commerciant));
+    }
+
+    public void addPaymentFailedTransaction (int timestamp) {
+        getTransactions().add(new PaymentFailed(timestamp));
     }
 
     public void addMoneyTransferTransaction (CommandInput input, String type, String currency) {

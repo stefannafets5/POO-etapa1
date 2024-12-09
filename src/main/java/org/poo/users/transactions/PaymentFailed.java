@@ -3,10 +3,10 @@ package org.poo.users.transactions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class CreateAccount extends Transaction {
+public class PaymentFailed extends Transaction {
 
-    public CreateAccount(int timestamp) {
-        super(timestamp, "New account created");
+    public PaymentFailed(int timestamp) {
+        super(timestamp, "Insufficient funds");
     }
 
     @Override
