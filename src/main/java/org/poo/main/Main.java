@@ -88,19 +88,24 @@ public final class Main {
             switch (command.getCommand()) {
                 case "printUsers" -> out.printUsers(bank, timestamp);
                 case "addAccount" -> bank.addAccount(command);
+                case "deleteAccount" -> {
+                    if (bank.deleteAccount(command) == 1) {
+                        out.deleteAccount(command.getTimestamp());
+                    } else {
+                        out.deleteAccountFail(command.getTimestamp());
+                    }
+                }
                 case "createCard" -> bank.createCard(command, "permanent");
                 case "createOneTimeCard" -> bank.createCard(command, "oneTime");
-                case "addFunds" -> bank.addFounds(command);
-                case "deleteAccount" -> {
-                    if (bank.deleteAccount(command) == 1)
-                        out.deleteAccount(command.getTimestamp());
-                }
                 case "deleteCard" -> bank.deleteCard(command);
+                case "addFunds" -> bank.addFounds(command);
+                case "sendMoney" -> bank.sendMoney(command);
                 case "payOnline" -> {
                     if (bank.payOnline(command) == 2)
                         out.cardNotFound(timestamp);
                 }
-                case "sendMoney" -> bank.sendMoney(command);
+                case "setAlias" -> bank.setAlias(command);
+                case "printTransactions" -> bank.printTransactions(command, out);
             }
         }
         Utils.resetRandom();

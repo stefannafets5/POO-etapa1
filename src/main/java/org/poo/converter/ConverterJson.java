@@ -8,6 +8,9 @@ import org.poo.fileio.CommandInput;
 import org.poo.users.User;
 import org.poo.users.Account;
 import org.poo.users.Card;
+import org.poo.users.transactions.Transaction;
+
+import java.util.ArrayList;
 
 public class ConverterJson {
     private final ArrayNode out;
@@ -75,6 +78,19 @@ public class ConverterJson {
         out.add(txt);
     }
 
+    public void deleteAccountFail(int timestamp){
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode txt = mapper.createObjectNode();
+
+        ObjectNode txt2 = mapper.createObjectNode();
+        txt2.put("error", "Account couldn't be deleted - see org.poo.transactions for details");
+        txt2.put("timestamp", timestamp);
+
+        txt.set("output", txt2);
+        txt.put("timestamp", timestamp);
+        txt.put("command", "deleteAccount");
+    }
+
     public void cardNotFound(int timestamp){
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
@@ -86,6 +102,21 @@ public class ConverterJson {
         txt2.put("description", "Card not found");
 
         txt.set("output", txt2);
+        txt.put("timestamp", timestamp);
+        out.add(txt);
+    }
+
+    public void printTransactions(ArrayList<Transaction> transactions, int timestamp){
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode txt = mapper.createObjectNode();
+
+        txt.put("command", "printTransactions");
+
+        ArrayNode transactionList = mapper.createArrayNode();
+        for (Transaction transaction : transactions)
+            transactionList.add(transaction.toJson(mapper));
+
+        txt.set("output", transactionList);
         txt.put("timestamp", timestamp);
         out.add(txt);
     }

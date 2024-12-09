@@ -3,6 +3,7 @@ package org.poo.bank;
 import java.util.ArrayList;
 import java.util.Currency;
 
+import org.poo.converter.ConverterJson;
 import org.poo.converter.CurrencyConverter;
 import org.poo.users.Account;
 import org.poo.users.User;
@@ -30,14 +31,25 @@ public class Bank {
         moneyConverter = new CurrencyConverter(input);
     }
 
+    public void setAlias (CommandInput input) {
+        String iban = input.getAccount();
+        String email = input.getEmail();
+        String alias = input.getAlias();
+
+        for (User user : users)
+            if (user.getEmail().equals(email))
+                for (Account currentAccount : user.getAccounts())
+                    if (currentAccount.getIban().equals(iban))
+                        currentAccount.setAlias(alias);
+    }
+
     public void addAccount (CommandInput input){
+        int timestamp = input.getTimestamp();
         String email = input.getEmail();
 
         for (User user : users)
             if (user.getEmail().equals(email)){
-                Account aux = new Account(input.getCurrency(),
-                        input.getAccountType(), input.getTimestamp());
-                user.getAccounts().add(aux);
+                user.addAccount(input);
                 break;
             }
     }
@@ -51,7 +63,7 @@ public class Bank {
                 for (int i = 0; i < user.getAccounts().size(); i++)
                     if (user.getAccounts().get(i).getIban().equals(iban))
                         if (user.getAccounts().get(i).getBalance() == 0){
-                            user.getAccounts().remove(i);
+                            user.deleteAccount(i);
                             return 1;
                         }
         return 0;
@@ -76,8 +88,7 @@ public class Bank {
             if (user.getEmail().equals(email))
                 for (Account currentAccount : user.getAccounts())
                     if (currentAccount.getIban().equals(iban)){
-                        Card card = new Card(input.getTimestamp(), type);
-                        currentAccount.getCards().add(card);
+                        currentAccount.addCard(input, type);
                         break;
                     }
     }
@@ -89,7 +100,7 @@ public class Bank {
             for (Account currentAccount : user.getAccounts())
                 for (int i = 0; i < currentAccount.getCards().size(); i++)
                     if (currentAccount.getCards().get(i).getCardNumber().equals(cardNr)){
-                        currentAccount.getCards().remove(i);
+                        currentAccount.removeCard(i);
                         break;
                     }
     }
@@ -122,12 +133,10 @@ public class Bank {
         return 0;
     }
 
-    public int sendMoney(CommandInput input){
+    public int sendMoney (CommandInput input){
         String iban = input.getAccount();
         double amount = input.getAmount();
         String ibanReceiver = input.getReceiver();
-        int timestamp = input.getTimestamp();
-        String description = input.getDescription();
         int hasMoney = 1;
         int found = 0;
         String from = "RON"; // initialization but never used like this
@@ -141,8 +150,10 @@ public class Bank {
                         System.out.println("Not enough money");
                         hasMoney = 0;
                     }
-                    if (hasMoney == 1)
+                    if (hasMoney == 1) {
                         currentAccount.subtractMoney(amount);
+                        user.addMoneyTransferTransaction(input, "sent", from);
+                    }
                 }
         for (User user : users)
             for (Account currentAccount : user.getAccounts())
@@ -151,11 +162,21 @@ public class Bank {
                     if (found == 1 && hasMoney == 1){
                         double amountToBePayed = moneyConverter.convert(amount, from, to);
                         currentAccount.addMoney(amountToBePayed);
+                        user.addMoneyTransferTransaction(input, "received", to);
                         return 1;
                     }
                 }
-
-
         return 0;
+    }
+
+    public void printTransactions (CommandInput input, ConverterJson out){
+        String email = input.getEmail();
+        int timestamp = input.getTimestamp();
+
+        for (User user : users)
+            if (user.getEmail().equals(email)) {
+                out.printTransactions(user.getTransactions(), timestamp);
+                break;
+            }
     }
 }

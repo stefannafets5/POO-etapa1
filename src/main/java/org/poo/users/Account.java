@@ -1,12 +1,15 @@
 package org.poo.users;
 
 import java.util.ArrayList;
+
+import org.poo.fileio.CommandInput;
 import org.poo.utils.Utils;
 
 public class Account {
     private String currency;
     private String type;
     private String iban;
+    private String alias;
     private double balance;
     private int timeOfCreation;
     private ArrayList<Card> cards = new ArrayList<>();
@@ -67,11 +70,28 @@ public class Account {
         this.timeOfCreation = timeOfCreation;
     }
 
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
     public void addMoney (double amount) {
         this.balance += amount;
     }
 
     public void subtractMoney (double amount) {
         this.balance -= amount;
+    }
+
+    public void addCard (CommandInput input, String type){
+        Card card = new Card(input.getTimestamp(), type);
+        getCards().add(card);
+    }
+
+    public void removeCard (int index){
+        getCards().remove(index);
     }
 }
