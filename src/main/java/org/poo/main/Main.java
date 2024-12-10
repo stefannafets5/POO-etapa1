@@ -5,18 +5,20 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.poo.checker.Checker;
 import org.poo.checker.CheckerConstants;
+import org.poo.commands.Command;
+import org.poo.converter.CurrencyConverter;
 import org.poo.fileio.CommandInput;
 import org.poo.fileio.ObjectInput;
 import org.poo.converter.ConverterJson;
 import org.poo.bank.Bank;
 import org.poo.utils.Utils;
+import org.poo.commands.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
@@ -79,43 +81,78 @@ public final class Main {
 
         ArrayNode output = objectMapper.createArrayNode();
         ConverterJson out = new ConverterJson(output);
-        Bank bank = new Bank(inputData);
+        Bank bank = Bank.getInstance(inputData);
 
         for (int i = 0; i < inputData.getCommands().length; i++) {
-            CommandInput command = inputData.getCommands()[i];
-            int timestamp = command.getTimestamp();
+            CommandInput input = inputData.getCommands()[i];
+            int timestamp = input.getTimestamp();
 
-            switch (command.getCommand()) {
-                case "printUsers" -> out.printUsers(bank, timestamp);
-                case "addAccount" -> bank.addAccount(command);
+            switch (input.getCommand()) {
+                case "printUsers" -> {
+                    Command toExecute = new PrintUsers(bank, out, timestamp);
+                    toExecute.execute();
+                }
+                case "addAccount" -> {
+                    Command toExecute = new AddAccount(bank, input);
+                    toExecute.execute();
+                }
                 case "deleteAccount" -> {
-                    if (bank.deleteAccount(command) == 1) {
-                        out.deleteAccount(command.getTimestamp());
-                    } else {
-                        out.deleteAccountFail(command.getTimestamp());
-                    }
+                    Command toExecute = new DeleteAccount(bank, input, out);
+                    toExecute.execute();
                 }
-                case "createCard" -> bank.createCard(command, "permanent");
-                case "createOneTimeCard" -> bank.createCard(command, "oneTime");
-                case "deleteCard" -> bank.deleteCard(command);
-                case "addFunds" -> bank.addFounds(command);
-                case "sendMoney" -> bank.sendMoney(command);
+                case "createCard" -> {
+                    Command toExecute = new CreateCard(bank, input);
+                    toExecute.execute();
+                }
+                case "createOneTimeCard" -> {
+                    Command toExecute = new CreateOneTimeCard(bank, input);
+                    toExecute.execute();
+                }
+                case "deleteCard" -> {
+                    Command toExecute = new DeleteCard(bank, input);
+                    toExecute.execute();
+                }
+                case "addFunds" -> {
+                    Command toExecute = new AddFunds(bank, input);
+                    toExecute.execute();
+                }
+                case "sendMoney" -> {
+                    Command toExecute = new SendMoney(bank, input);
+                    toExecute.execute();
+                }
                 case "payOnline" -> {
-                    if (bank.payOnline(command) == 2)
-                        out.cardNotFound(timestamp, "payOnline");
+                    Command toExecute = new PayOnline(bank, input, out);
+                    toExecute.execute();
                 }
-                case "setAlias" -> bank.setAlias(command);
-                case "printTransactions" -> bank.printTransactions(command, out);
-                case "setMinimumBalance" -> bank.setMinimumBalance(command);
+                case "setAlias" -> {
+                    Command toExecute = new SetAlias(bank, input);
+                    toExecute.execute();
+                }
+                case "printTransactions" -> {
+                    Command toExecute = new PrintTransactions(bank, input, out);
+                    toExecute.execute();
+                }
+                case "setMinimumBalance" -> {
+                    Command toExecute = new SetMinimumBalance(bank, input);
+                    toExecute.execute();
+                }
                 case "checkCardStatus" -> {
-                    if (bank.checkCardStatus(command) == 0)
-                        out.cardNotFound(timestamp, "checkCardStatus");
+                    Command toExecute = new CheckCardStatus(bank, input, out);
+                    toExecute.execute();
                 }
-                case "changeInterestRate" -> bank.changeInterestRate(command);
-                case "splitPayment" -> bank.splitPayment(command);
+                case "changeInterestRate" -> {
+                    Command toExecute = new ChangeInterestRate(bank, input);
+                    toExecute.execute();
+                }
+                case "splitPayment" -> {
+                    Command toExecute = new SplitPayment(bank, input);
+                    toExecute.execute();
+                }
             }
         }
         Utils.resetRandom();
+        Bank.resetInstance();
+        CurrencyConverter.resetInstance();
 
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
         objectWriter.writeValue(new File(filePath2), output);

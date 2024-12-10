@@ -12,6 +12,7 @@ import org.poo.fileio.ObjectInput;
 import org.poo.fileio.CommandInput;
 
 public class Bank {
+    private static Bank instance;
     private final ArrayList<User> users = new ArrayList<>();
     private CurrencyConverter moneyConverter;
 
@@ -19,17 +20,27 @@ public class Bank {
         return users;
     }
 
-    public CurrencyConverter getCurrencyConverter() {
+    public CurrencyConverter getMoneyConverter() {
         return moneyConverter;
     }
 
-    public Bank (ObjectInput input) {
+    private Bank (ObjectInput input) {
         for (int i = 0; i < input.getUsers().length; i++) { // initialize users
             this.users.add(new User(input.getUsers()[i].getFirstName(),
                     input.getUsers()[i].getLastName(),
                     input.getUsers()[i].getEmail()));
         }
-        moneyConverter = new CurrencyConverter(input);
+        moneyConverter = CurrencyConverter.getInstance(input);
+    }
+
+    public static Bank getInstance(ObjectInput input) {
+        if (instance == null)
+            instance = new Bank(input);
+        return instance;
+    }
+
+    public static void resetInstance() {
+        instance = null;
     }
 
     public void setAlias (CommandInput input) {
@@ -154,7 +165,7 @@ public class Bank {
                         if (currentCard.getCardNumber().equals(cardNr)) {
                             found = 1;
                             String to = currentAccount.getCurrency();
-                            double amountToBePayed = moneyConverter.convert(amount, from, to);
+                            double amountToBePayed = getMoneyConverter().convert(amount, from, to);
                             if (currentCard.getStatus().equals("frozen")) {
                                 user.addErrorTransaction(timestamp, "The card is frozen");
                                 return 0;
@@ -174,7 +185,8 @@ public class Bank {
     }
 
     public void splitPayment (CommandInput input){
-        
+        ArrayList<String> ibans = new ArrayList<>();
+
     }
 
     public int sendMoney (CommandInput input){
@@ -212,7 +224,7 @@ public class Bank {
                     if (currentAccount.getIban().equals(ibanReceiver)) {
                         String to = currentAccount.getCurrency();
                         if (found == 1 && hasMoney == 1) {
-                            double amountToBePayed = moneyConverter.convert(amount, from, to);
+                            double amountToBePayed = getMoneyConverter().convert(amount, from, to);
                             currentAccount.addMoney(amountToBePayed);
                             //user.addMoneyTransferTransaction(input, "received", to);
                             return 1;

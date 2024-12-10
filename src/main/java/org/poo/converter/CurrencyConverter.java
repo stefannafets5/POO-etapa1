@@ -6,14 +6,26 @@ import org.poo.fileio.ObjectInput;
 import java.util.*;
 
 public class CurrencyConverter {
+    private static CurrencyConverter instance;
     private final ArrayList<ExchangeRate> exchangeRates= new ArrayList<>();
 
-    public CurrencyConverter(ObjectInput input) {
+    private CurrencyConverter(ObjectInput input) {
         for (int i = 0; i < input.getExchangeRates().length; i++) { // initialize exchange rates
             this.exchangeRates.add(new ExchangeRate(input.getExchangeRates()[i].getFrom(),
                     input.getExchangeRates()[i].getTo(),
                     input.getExchangeRates()[i].getRate()));
         }
+    }
+
+    public static CurrencyConverter getInstance(ObjectInput input) {
+        if (instance == null) {
+            instance = new CurrencyConverter(input);
+        }
+        return instance;
+    }
+
+    public static void resetInstance() {
+        instance = null;
     }
 
     public double convert(double amount, String from, String to) {
