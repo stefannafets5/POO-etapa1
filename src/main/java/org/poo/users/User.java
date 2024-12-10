@@ -96,4 +96,11 @@ public class User {
         getTransactions().add(new MoneyTransfer(input.getTimestamp(),input.getDescription(),
                 input.getAccount(), input.getReceiver(), input.getAmount(), type, currency));
     }
+
+    public void addSplitCardPaymentTransaction (int timestamp, double amount,
+                                                double splitAmmount, String currency,
+                                                ArrayList<String> ibanList){
+        getTransactions().add(new SplitCardPayment(timestamp, amount,
+                splitAmmount, currency, ibanList));
+    }
 }

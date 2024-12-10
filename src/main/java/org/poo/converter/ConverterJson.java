@@ -121,4 +121,27 @@ public class ConverterJson {
         txt.put("timestamp", timestamp);
         out.add(txt);
     }
+
+    public void createReport(ArrayList<Transaction> transactions,
+                             CommandInput input, Account account){
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode txt = mapper.createObjectNode();
+
+        txt.put("command", "report");
+
+        ObjectNode txt2 = mapper.createObjectNode();
+        txt2.put("IBAN", account.getIban());
+        txt2.put("balance", account.getBalance());
+        txt2.put("currency", account.getCurrency());
+        ArrayNode transactionList = mapper.createArrayNode();
+        for (Transaction transaction : transactions)
+            if (transaction.getTimestamp() >= input.getStartTimestamp()
+                    && transaction.getTimestamp() <= input.getEndTimestamp() )
+                transactionList.add(transaction.toJson(mapper));
+        txt2.set("transactions", transactionList);
+
+        txt.set("output", txt2);
+        txt.put("timestamp", input.getTimestamp());
+        out.add(txt);
+    }
 }

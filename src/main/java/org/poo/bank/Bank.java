@@ -1,6 +1,7 @@
 package org.poo.bank;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.poo.converter.ConverterJson;
 import org.poo.converter.CurrencyConverter;
@@ -184,9 +185,46 @@ public class Bank {
         return 0;
     }
 
-    public void splitPayment (CommandInput input){
-        ArrayList<String> ibans = new ArrayList<>();
+    public int splitPayment (CommandInput input){
+        ArrayList<String> ibanList = new ArrayList<>(input.getAccounts());
+        double amount = input.getAmount();
+        double eachAccountAmount = amount/ibanList.size();
+        String from = input.getCurrency();
+        int timestamp = input.getTimestamp();
+        int everyoneHasMoney = 0;
 
+        for (User user : users) { // check if everyone can pay
+            for (Account currentAccount : user.getAccounts()) {
+                for (String iban : ibanList) {
+                    if (currentAccount.getIban().equals(iban)) {
+                        String to = currentAccount.getCurrency();
+                        double amountToBePayed =
+                                getMoneyConverter().convert(eachAccountAmount, from, to);
+                        if (currentAccount.getBalance() >= amountToBePayed) {
+                            everyoneHasMoney++;
+                        }
+                    }
+                }
+            }
+        }
+        if (everyoneHasMoney == ibanList.size()){
+            for (User user : users) {
+                for (Account currentAccount : user.getAccounts()) {
+                    for (String iban : ibanList) {
+                        if (currentAccount.getIban().equals(iban)) {
+                            String to = currentAccount.getCurrency();
+                            double amountToBePayed =
+                                    getMoneyConverter().convert(eachAccountAmount, from, to);
+                            currentAccount.subtractMoney(amountToBePayed);
+                            user.addSplitCardPaymentTransaction(timestamp,
+                                    amountToBePayed, amount, from, ibanList);
+                        }
+                    }
+                }
+            }
+            return 1;
+        }
+        return 0; // maybe need to create a fail transaction
     }
 
     public int sendMoney (CommandInput input){
@@ -257,5 +295,14 @@ public class Bank {
                         savingsAccount.setInterestRate(interestRate);
                     }
 
+    }
+
+    public void createReport (CommandInput input, ConverterJson out){
+        String iban = input.getAccount();
+
+        for (User user : users)
+            for (Account currentAccount : user.getAccounts())
+                if (currentAccount.getIban().equals(iban))
+                    out.createReport(user.getTransactions(), input, currentAccount);
     }
 }

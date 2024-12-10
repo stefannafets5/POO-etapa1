@@ -148,6 +148,10 @@ public final class Main {
                     Command toExecute = new SplitPayment(bank, input);
                     toExecute.execute();
                 }
+                case "report" -> {
+                    Command toExecute = new Report(bank, input, out);
+                    toExecute.execute();
+                }
             }
         }
         Utils.resetRandom();
