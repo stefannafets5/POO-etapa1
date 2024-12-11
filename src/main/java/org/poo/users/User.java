@@ -84,17 +84,20 @@ public class User {
         getTransactions().add(new CreateAccount(timestamp));
     }
 
-    public void addCardPaymentTransaction (int timestamp, double amount, String commerciant) {
-        getTransactions().add(new CardPayment(timestamp, amount, commerciant));
+    public void addCardPaymentTransaction (int timestamp, double amount, String commerciant, String iban) {
+        getTransactions().add(new CardPayment(timestamp, amount, commerciant, iban));
     }
 
     public void addPaymentFailedTransaction (int timestamp) {
         getTransactions().add(new PaymentFailed(timestamp));
     }
+    public void addSplitPaymentFailedTransaction(CommandInput input, String poor){
+        getTransactions().add(new SplitPaymentFailed(input, poor));
+    }
 
-    public void addMoneyTransferTransaction (CommandInput input, String type, String currency) {
+    public void addMoneyTransferTransaction (CommandInput input, String type, String currency, double amount) {
         getTransactions().add(new MoneyTransfer(input.getTimestamp(),input.getDescription(),
-                input.getAccount(), input.getReceiver(), input.getAmount(), type, currency));
+                input.getAccount(), input.getReceiver(), amount, type, currency));
     }
 
     public void addSplitCardPaymentTransaction (int timestamp, double amount,

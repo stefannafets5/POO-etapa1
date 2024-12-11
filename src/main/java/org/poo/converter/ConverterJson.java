@@ -8,9 +8,12 @@ import org.poo.fileio.CommandInput;
 import org.poo.users.User;
 import org.poo.users.Account;
 import org.poo.users.Card;
+import org.poo.users.transactions.CardPayment;
+import org.poo.users.transactions.SplitPaymentFailed;
 import org.poo.users.transactions.Transaction;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class ConverterJson {
     private final ArrayNode out;
@@ -92,7 +95,7 @@ public class ConverterJson {
         out.add(txt);
     }
 
-    public void cardNotFound(int timestamp, String command){
+    public void printError(int timestamp, String command, String error){
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
 
@@ -100,7 +103,7 @@ public class ConverterJson {
 
         ObjectNode txt2 = mapper.createObjectNode();
         txt2.put("timestamp", timestamp);
-        txt2.put("description", "Card not found");
+        txt2.put("description", error);
 
         txt.set("output", txt2);
         txt.put("timestamp", timestamp);
@@ -114,8 +117,9 @@ public class ConverterJson {
         txt.put("command", "printTransactions");
 
         ArrayNode transactionList = mapper.createArrayNode();
-        for (Transaction transaction : transactions)
+        for (Transaction transaction : transactions) {
             transactionList.add(transaction.toJson(mapper));
+        }
 
         txt.set("output", transactionList);
         txt.put("timestamp", timestamp);
@@ -123,11 +127,13 @@ public class ConverterJson {
     }
 
     public void createReport(ArrayList<Transaction> transactions,
-                             CommandInput input, Account account){
+                             CommandInput input, Account account, String type){
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
 
-        txt.put("command", "report");
+        if (type.equals("normal"))
+            txt.put("command", "report");
+        else txt.put("command", "spendingsReport");
 
         ObjectNode txt2 = mapper.createObjectNode();
         txt2.put("IBAN", account.getIban());
@@ -136,9 +142,40 @@ public class ConverterJson {
         ArrayNode transactionList = mapper.createArrayNode();
         for (Transaction transaction : transactions)
             if (transaction.getTimestamp() >= input.getStartTimestamp()
-                    && transaction.getTimestamp() <= input.getEndTimestamp() )
-                transactionList.add(transaction.toJson(mapper));
+                    && transaction.getTimestamp() <= input.getEndTimestamp() ) {
+                if (type.equals("normal")) {
+                    transactionList.add(transaction.toJson(mapper));
+                } else if (transaction.getDescription().equals("Card payment")) {
+                    CardPayment pay = (CardPayment) transaction;
+                    if (pay.getIban().equals(account.getIban()))
+                        transactionList.add(transaction.toJson(mapper));
+                }
+            }
         txt2.set("transactions", transactionList);
+
+        if (type.equals("spendings")){
+            ArrayList<CardPayment> cardPayments = new ArrayList<>();
+            for (Transaction transaction : transactions)
+                if (transaction.getTimestamp() >= input.getStartTimestamp() &&
+                        transaction.getTimestamp() <= input.getEndTimestamp() &&
+                        transaction.getDescription().equals("Card payment")) {
+                    cardPayments.add((CardPayment) transaction);
+                }
+            cardPayments.sort(Comparator.comparing(CardPayment::getCommerciant));
+
+            ArrayNode commerciantsList = mapper.createArrayNode();
+            for (CardPayment pay : cardPayments) {
+                if (pay.getTimestamp() >= input.getStartTimestamp() &&
+                        pay.getTimestamp() <= input.getEndTimestamp() &&
+                        pay.getIban().equals(account.getIban())) {
+                    ObjectNode txt3 = mapper.createObjectNode();
+                    txt3.put("commerciant", pay.getCommerciant() != null ? pay.getCommerciant() : "Unknown");
+                    txt3.put("total", pay.getAmount());
+                    commerciantsList.add(txt3);
+                }
+            }
+            txt2.set("commerciants", commerciantsList);
+        }
 
         txt.set("output", txt2);
         txt.put("timestamp", input.getTimestamp());

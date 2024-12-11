@@ -17,6 +17,7 @@ public class Report implements Command {
 
     @Override
     public void execute() {
-        bank.createReport(input, out);
+        if (bank.createReport(input, out, "normal") == 0)
+            out.printError(input.getTimestamp(), "report", "Account not found");
     }
 }

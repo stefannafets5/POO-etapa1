@@ -140,16 +140,24 @@ public final class Main {
                     Command toExecute = new CheckCardStatus(bank, input, out);
                     toExecute.execute();
                 }
+                case "addInterest" -> {
+                    Command toExecute = new AddInterest(bank, input, out);
+                    toExecute.execute();
+                }
                 case "changeInterestRate" -> {
-                    Command toExecute = new ChangeInterestRate(bank, input);
+                    Command toExecute = new ChangeInterestRate(bank, input, out);
                     toExecute.execute();
                 }
                 case "splitPayment" -> {
-                    Command toExecute = new SplitPayment(bank, input);
+                    Command toExecute = new SplitPayment(bank, input, out);
                     toExecute.execute();
                 }
                 case "report" -> {
                     Command toExecute = new Report(bank, input, out);
+                    toExecute.execute();
+                }
+                case "spendingsReport" -> {
+                    Command toExecute = new SpendingsReport(bank, input, out);
                     toExecute.execute();
                 }
             }

@@ -18,6 +18,6 @@ public class PayOnline implements Command{
     @Override
     public void execute() {
         if (bank.payOnline(input) == 2)
-            out.cardNotFound(input.getTimestamp(), "payOnline");
+            out.printError(input.getTimestamp(), "payOnline", "Card not found");
     }
 }

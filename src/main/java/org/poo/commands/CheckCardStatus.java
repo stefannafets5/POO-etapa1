@@ -18,6 +18,6 @@ public class CheckCardStatus implements Command{
     @Override
     public void execute() {
         if (bank.checkCardStatus(input) == 0)
-            out.cardNotFound(input.getTimestamp(), "checkCardStatus");
+            out.printError(input.getTimestamp(), "checkCardStatus", "Card not found");
     }
 }

@@ -10,11 +10,11 @@ public class Card {
     private String status;
     private String cardNumber;
     private String type;
-    private int timeOfCreation;
+    private int timestamp; /// probabil nu e nevoie de asta
 
-    public Card(int timeOfCreation, String type) {
+    public Card(int timestamp, String type) {
         this.status = "active";
-        this.timeOfCreation = timeOfCreation;
+        this.timestamp = timestamp;
         this.cardNumber = Utils.generateCardNumber();
         this.type = type;
     }
@@ -35,12 +35,12 @@ public class Card {
         this.cardNumber = cardNumber;
     }
 
-    public int getTimeOfCreation() {
-        return timeOfCreation;
+    public int getTimestamp() {
+        return timestamp;
     }
 
-    public void setTimeOfCreation(int timeOfCreation) {
-        this.timeOfCreation = timeOfCreation;
+    public void setTimestamp(int timestamp) {
+        this.timestamp = timestamp;
     }
 
     public String getType() {

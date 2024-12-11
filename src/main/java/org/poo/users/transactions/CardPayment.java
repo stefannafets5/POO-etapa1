@@ -6,11 +6,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class CardPayment extends Transaction {
     private double amount;
     private String commerciant;
+    private String iban;
 
-    public CardPayment(int timestamp, double amount, String commerciant) {
+    public CardPayment(int timestamp, double amount, String commerciant, String iban) {
         super(timestamp, "Card payment");
         this.amount = amount;
         this.commerciant = commerciant;
+        this.iban = iban;
     }
 
     public double getAmount() {
@@ -27,6 +29,14 @@ public class CardPayment extends Transaction {
 
     public void setCommerciant(String commerciant) {
         this.commerciant = commerciant;
+    }
+
+    public String getIban() {
+        return iban;
+    }
+
+    public void setIban(String iban) {
+        this.iban = iban;
     }
 
     @Override

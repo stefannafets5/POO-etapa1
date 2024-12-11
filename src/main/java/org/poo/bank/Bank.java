@@ -1,7 +1,6 @@
 package org.poo.bank;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.poo.converter.ConverterJson;
 import org.poo.converter.CurrencyConverter;
@@ -69,16 +68,22 @@ public class Bank {
     public int deleteAccount (CommandInput input){
         String iban = input.getAccount();
         String email = input.getEmail();
+        int canDelete = 0;
 
         for (User user : users)
             if (user.getEmail().equals(email))
                 for (int i = 0; i < user.getAccounts().size(); i++)
-                    if (user.getAccounts().get(i).getIban().equals(iban))
-                        if (user.getAccounts().get(i).getBalance() == 0){
+                    if (user.getAccounts().get(i).getIban().equals(iban)) {
+                        if (user.getAccounts().get(i).getBalance() == 0) {
                             user.deleteAccount(i);
-                            return 1;
+                            canDelete = 1;
+                        } else {
+                            user.addErrorTransaction(input.getTimestamp(),
+                                    "Account couldn't be deleted " +
+                                            "- there are funds remaining");
                         }
-        return 0;
+                    }
+        return canDelete;
     }
 
     public void addFounds (CommandInput input){
@@ -162,7 +167,8 @@ public class Bank {
         for (User user : users)
             if (user.getEmail().equals(email))
                 for (Account currentAccount : user.getAccounts())
-                    for (Card currentCard : currentAccount.getCards())
+                    for (int i = 0; i < currentAccount.getCards().size(); i++) {
+                        Card currentCard = currentAccount.getCards().get(i);
                         if (currentCard.getCardNumber().equals(cardNr)) {
                             found = 1;
                             String to = currentAccount.getCurrency();
@@ -172,10 +178,19 @@ public class Bank {
                                 return 0;
                             } else if (currentAccount.getBalance() >= amountToBePayed) {
                                 currentAccount.subtractMoney(amountToBePayed);
-                                user.addCardPaymentTransaction(timestamp, amountToBePayed, commerciant);
+                                user.addCardPaymentTransaction(timestamp, amountToBePayed,
+                                        commerciant, currentAccount.getIban());
+                                //TODO
+                                if (currentCard.getType().equals("oneTime")) {
+
+                                    currentAccount.getCards().remove(i);
+                                    currentAccount.addCard(input,"oneTime",
+                                            user.getTransactions(), "New card created");
+                                }
                                 return 1;
                             }
                         }
+                    }
         for (User user : users) /// paying failed
             if (user.getEmail().equals(email) && found == 1)
                 user.addPaymentFailedTransaction(timestamp);
@@ -185,13 +200,14 @@ public class Bank {
         return 0;
     }
 
-    public int splitPayment (CommandInput input){
+    public void splitPayment (CommandInput input){
         ArrayList<String> ibanList = new ArrayList<>(input.getAccounts());
         double amount = input.getAmount();
         double eachAccountAmount = amount/ibanList.size();
         String from = input.getCurrency();
         int timestamp = input.getTimestamp();
         int everyoneHasMoney = 0;
+        String poor = "nobody";
 
         for (User user : users) { // check if everyone can pay
             for (Account currentAccount : user.getAccounts()) {
@@ -202,11 +218,23 @@ public class Bank {
                                 getMoneyConverter().convert(eachAccountAmount, from, to);
                         if (currentAccount.getBalance() >= amountToBePayed) {
                             everyoneHasMoney++;
+                        } else if (poor.equals("nobody")){
+                            poor = currentAccount.getIban();
+                            System.out.println(poor);
                         }
                     }
                 }
             }
         }
+
+        for (User user : users)
+            for (Account currentAccount : user.getAccounts())
+                for (String iban : ibanList)
+                    if (currentAccount.getIban().equals(iban) &&
+                            !poor.equals("nobody")) {
+                        user.addSplitPaymentFailedTransaction(input, poor);
+                    }
+
         if (everyoneHasMoney == ibanList.size()){
             for (User user : users) {
                 for (Account currentAccount : user.getAccounts()) {
@@ -222,9 +250,7 @@ public class Bank {
                     }
                 }
             }
-            return 1;
         }
-        return 0; // maybe need to create a fail transaction
     }
 
     public int sendMoney (CommandInput input){
@@ -254,7 +280,7 @@ public class Bank {
                         }
                         if (hasMoney == 1) {
                             currentAccount.subtractMoney(amount);
-                            user.addMoneyTransferTransaction(input, "sent", from);
+                            user.addMoneyTransferTransaction(input, "sent", from, amount);
                         }
                     }
             for (User user : users)
@@ -264,7 +290,7 @@ public class Bank {
                         if (found == 1 && hasMoney == 1) {
                             double amountToBePayed = getMoneyConverter().convert(amount, from, to);
                             currentAccount.addMoney(amountToBePayed);
-                            //user.addMoneyTransferTransaction(input, "received", to);
+                            user.addMoneyTransferTransaction(input, "received", to, amountToBePayed);
                             return 1;
                         }
                     }
@@ -283,26 +309,48 @@ public class Bank {
             }
     }
 
-    public void changeInterestRate (CommandInput input){
+    public int changeInterestRate (CommandInput input){
         String iban = input.getAccount();
         double interestRate = input.getInterestRate();
+        int exists = 0;
 
         for (User user : users)
             for (Account currentAccount : user.getAccounts())
                 if (currentAccount.getIban().equals(iban))
                     if (currentAccount.getType().equals("savings")){
+                        exists = 1;
                         SavingsAccount savingsAccount = (SavingsAccount) currentAccount;
                         savingsAccount.setInterestRate(interestRate);
                     }
-
+        return exists;
     }
 
-    public void createReport (CommandInput input, ConverterJson out){
+    public int addInterest(CommandInput input){
         String iban = input.getAccount();
+        int exists = 0;
 
         for (User user : users)
             for (Account currentAccount : user.getAccounts())
                 if (currentAccount.getIban().equals(iban))
-                    out.createReport(user.getTransactions(), input, currentAccount);
+                    if (currentAccount.getType().equals("savings")){
+                        exists = 1;
+                        SavingsAccount savingsAccount = (SavingsAccount) currentAccount;
+                        double balance = savingsAccount.getBalance();
+                        double rate = savingsAccount.getInterestRate();
+                        savingsAccount.addMoney(balance * rate);
+                    }
+        return exists;
+    }
+
+    public int createReport (CommandInput input, ConverterJson out, String type){
+        String iban = input.getAccount();
+
+        for (User user : users)
+            for (Account currentAccount : user.getAccounts())
+                if (currentAccount.getIban().equals(iban)) {
+                    out.createReport(user.getTransactions(), input, currentAccount, type);
+                    return 1;
+                }
+        return 0;
     }
 }
