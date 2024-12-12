@@ -14,13 +14,14 @@ public class SplitPaymentFailed extends Transaction {
     private ArrayList<String> ibanList;
 
 
-    public SplitPaymentFailed(CommandInput input, String poor) {
+    public SplitPaymentFailed(CommandInput input, String poor, String fromIban) {
         super(input.getTimestamp(), "Split payment of " +
                 input.getAmount() + "0 " + input.getCurrency());
         this.amount = input.getAmount()/input.getAccounts().size();
         this.currency = input.getCurrency();
         this.poor= poor;
         this.ibanList = (ArrayList<String>) input.getAccounts();
+        setFromIban(fromIban);
     }
 
     public double getAmount() {

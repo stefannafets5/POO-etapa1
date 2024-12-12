@@ -142,15 +142,19 @@ public class ConverterJson {
         ArrayNode transactionList = mapper.createArrayNode();
         for (Transaction transaction : transactions)
             if (transaction.getTimestamp() >= input.getStartTimestamp()
-                    && transaction.getTimestamp() <= input.getEndTimestamp() ) {
-                if (type.equals("normal")) {
-                    transactionList.add(transaction.toJson(mapper));
-                } else if (transaction.getDescription().equals("Card payment")) {
-                    CardPayment pay = (CardPayment) transaction;
-                    if (pay.getIban().equals(account.getIban()))
+                    && transaction.getTimestamp() <= input.getEndTimestamp()) {
+                if (transaction.getFromIban().equals(" ")
+                        || transaction.getFromIban().equals(account.getIban())) {
+                    if (type.equals("normal")) {
                         transactionList.add(transaction.toJson(mapper));
+                    } else if (transaction.getDescription().equals("Card payment")) {
+                        CardPayment pay = (CardPayment) transaction;
+                        if (pay.getIban().equals(account.getIban()))
+                            transactionList.add(transaction.toJson(mapper));
+                    }
                 }
             }
+
         txt2.set("transactions", transactionList);
 
         if (type.equals("spendings")){
@@ -179,6 +183,21 @@ public class ConverterJson {
 
         txt.set("output", txt2);
         txt.put("timestamp", input.getTimestamp());
+        out.add(txt);
+    }
+
+    public void spendingsReportError(int timestamp){
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode txt = mapper.createObjectNode();
+
+        txt.put("command", "spendingsReport");
+
+        ObjectNode txt2 = mapper.createObjectNode();
+        txt2.put("error", "This kind of report is " +
+                    "not supported for a saving account");
+
+        txt.set("output", txt2);
+        txt.put("timestamp", timestamp);
         out.add(txt);
     }
 }

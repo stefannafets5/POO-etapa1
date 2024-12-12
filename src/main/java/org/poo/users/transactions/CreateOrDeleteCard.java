@@ -14,6 +14,7 @@ public class CreateOrDeleteCard extends Transaction {
         this.cardNr = cardNr;
         this.email = email;
         this.iban = iban;
+        setFromIban(iban);
     }
 
     public String getCardNr() {

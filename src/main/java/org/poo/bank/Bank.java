@@ -180,10 +180,10 @@ public class Bank {
                                 currentAccount.subtractMoney(amountToBePayed);
                                 user.addCardPaymentTransaction(timestamp, amountToBePayed,
                                         commerciant, currentAccount.getIban());
-                                //TODO
-                                if (currentCard.getType().equals("oneTime")) {
 
-                                    currentAccount.getCards().remove(i);
+                                if (currentCard.getType().equals("oneTime")) {
+                                    currentAccount.removeCard(i, input, user.getEmail(),
+                                            user.getTransactions(), "The card has been destroyed");
                                     currentAccount.addCard(input,"oneTime",
                                             user.getTransactions(), "New card created");
                                 }
@@ -191,7 +191,7 @@ public class Bank {
                             }
                         }
                     }
-        for (User user : users) /// paying failed
+        for (User user : users) // paying failed
             if (user.getEmail().equals(email) && found == 1)
                 user.addPaymentFailedTransaction(timestamp);
 
@@ -209,18 +209,17 @@ public class Bank {
         int everyoneHasMoney = 0;
         String poor = "nobody";
 
-        for (User user : users) { // check if everyone can pay
-            for (Account currentAccount : user.getAccounts()) {
-                for (String iban : ibanList) {
+        for (String iban : ibanList) {
+            for (User user : users) { // check if everyone can pay
+                for (Account currentAccount : user.getAccounts()) {
                     if (currentAccount.getIban().equals(iban)) {
                         String to = currentAccount.getCurrency();
                         double amountToBePayed =
                                 getMoneyConverter().convert(eachAccountAmount, from, to);
                         if (currentAccount.getBalance() >= amountToBePayed) {
                             everyoneHasMoney++;
-                        } else if (poor.equals("nobody")){
+                        } else {
                             poor = currentAccount.getIban();
-                            System.out.println(poor);
                         }
                     }
                 }
@@ -232,7 +231,7 @@ public class Bank {
                 for (String iban : ibanList)
                     if (currentAccount.getIban().equals(iban) &&
                             !poor.equals("nobody")) {
-                        user.addSplitPaymentFailedTransaction(input, poor);
+                        user.addSplitPaymentFailedTransaction(input, poor, iban);
                     }
 
         if (everyoneHasMoney == ibanList.size()){
@@ -321,6 +320,9 @@ public class Bank {
                         exists = 1;
                         SavingsAccount savingsAccount = (SavingsAccount) currentAccount;
                         savingsAccount.setInterestRate(interestRate);
+                        user.addChangedInterestTransaction(input.getTimestamp(),
+                                "Interest rate of the account changed to " +
+                                interestRate);
                     }
         return exists;
     }
@@ -348,7 +350,13 @@ public class Bank {
         for (User user : users)
             for (Account currentAccount : user.getAccounts())
                 if (currentAccount.getIban().equals(iban)) {
-                    out.createReport(user.getTransactions(), input, currentAccount, type);
+
+                    if (currentAccount.getType().equals("savings") &&
+                            input.getCommand().equals("spendingsReport")) {
+                        out.spendingsReportError(input.getTimestamp());
+                    } else {
+                        out.createReport(user.getTransactions(), input, currentAccount, type);
+                    }
                     return 1;
                 }
         return 0;

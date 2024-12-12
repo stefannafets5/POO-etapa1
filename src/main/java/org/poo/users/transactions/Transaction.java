@@ -7,10 +7,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public abstract class Transaction {
     private int timestamp;
     private String description;
+    private String fromIban = " ";
 
     public Transaction(int timestamp, String description){
         this.timestamp = timestamp;
         this.description = description;
+    }
+
+    public String getFromIban() {
+        return fromIban;
+    }
+
+    public void setFromIban(String fromIban) {
+        this.fromIban = fromIban;
     }
 
     public int getTimestamp() {

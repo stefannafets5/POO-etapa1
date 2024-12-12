@@ -91,13 +91,17 @@ public class User {
     public void addPaymentFailedTransaction (int timestamp) {
         getTransactions().add(new PaymentFailed(timestamp));
     }
-    public void addSplitPaymentFailedTransaction(CommandInput input, String poor){
-        getTransactions().add(new SplitPaymentFailed(input, poor));
+    public void addSplitPaymentFailedTransaction(CommandInput input, String poor, String fromIban){
+        getTransactions().add(new SplitPaymentFailed(input, poor, fromIban));
     }
 
     public void addMoneyTransferTransaction (CommandInput input, String type, String currency, double amount) {
         getTransactions().add(new MoneyTransfer(input.getTimestamp(),input.getDescription(),
                 input.getAccount(), input.getReceiver(), amount, type, currency));
+    }
+
+    public void addChangedInterestTransaction (int timestamp, String description) {
+        getTransactions().add(new Error(timestamp, description));
     }
 
     public void addSplitCardPaymentTransaction (int timestamp, double amount,
