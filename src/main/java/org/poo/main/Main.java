@@ -86,85 +86,11 @@ public final class Main {
         ConverterJson out = new ConverterJson(output);
         Bank bank = Bank.getInstance(inputData);
 
-        for (int i = 0; i < inputData.getCommands().length; i++) {
-            CommandInput input = inputData.getCommands()[i];
-            int timestamp = input.getTimestamp();
-
-            switch (input.getCommand()) {
-                case "printUsers" -> {
-                    Command toExecute = new PrintUsers(bank, out, timestamp);
-                    toExecute.execute();
-                }
-                case "addAccount" -> {
-                    Command toExecute = new AddAccount(bank, input);
-                    toExecute.execute();
-                }
-                case "deleteAccount" -> {
-                    Command toExecute = new DeleteAccount(bank, input, out);
-                    toExecute.execute();
-                }
-                case "createCard" -> {
-                    Command toExecute = new CreateCard(bank, input);
-                    toExecute.execute();
-                }
-                case "createOneTimeCard" -> {
-                    Command toExecute = new CreateOneTimeCard(bank, input);
-                    toExecute.execute();
-                }
-                case "deleteCard" -> {
-                    Command toExecute = new DeleteCard(bank, input);
-                    toExecute.execute();
-                }
-                case "addFunds" -> {
-                    Command toExecute = new AddFunds(bank, input);
-                    toExecute.execute();
-                }
-                case "sendMoney" -> {
-                    Command toExecute = new SendMoney(bank, input);
-                    toExecute.execute();
-                }
-                case "payOnline" -> {
-                    Command toExecute = new PayOnline(bank, input, out);
-                    toExecute.execute();
-                }
-                case "setAlias" -> {
-                    Command toExecute = new SetAlias(bank, input);
-                    toExecute.execute();
-                }
-                case "printTransactions" -> {
-                    Command toExecute = new PrintTransactions(bank, input, out);
-                    toExecute.execute();
-                }
-                case "setMinimumBalance" -> {
-                    Command toExecute = new SetMinimumBalance(bank, input);
-                    toExecute.execute();
-                }
-                case "checkCardStatus" -> {
-                    Command toExecute = new CheckCardStatus(bank, input, out);
-                    toExecute.execute();
-                }
-                case "addInterest" -> {
-                    Command toExecute = new AddInterest(bank, input, out);
-                    toExecute.execute();
-                }
-                case "changeInterestRate" -> {
-                    Command toExecute = new ChangeInterestRate(bank, input, out);
-                    toExecute.execute();
-                }
-                case "splitPayment" -> {
-                    Command toExecute = new SplitPayment(bank, input);
-                    toExecute.execute();
-                }
-                case "report" -> {
-                    Command toExecute = new Report(bank, input, out);
-                    toExecute.execute();
-                }
-                case "spendingsReport" -> {
-                    Command toExecute = new SpendingsReport(bank, input, out);
-                    toExecute.execute();
-                }
-            }
+        for (CommandInput input : inputData.getCommands()) {
+            Command toExecute = CommandFactory.createCommand(bank, input, out);
+            toExecute.execute();
         }
+
         Utils.resetRandom();
         Bank.resetInstance();
         CurrencyConverter.resetInstance();
