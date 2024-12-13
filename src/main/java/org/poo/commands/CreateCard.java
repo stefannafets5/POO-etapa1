@@ -3,11 +3,20 @@ package org.poo.commands;
 import org.poo.bank.Bank;
 import org.poo.fileio.CommandInput;
 
-public class CreateCard implements Command{
+/**
+ * The type Create card.
+ */
+public final class CreateCard implements Command {
     private Bank bank;
     private CommandInput input;
 
-    public CreateCard(Bank bank, CommandInput input) {
+    /**
+     * Instantiates a new Create card.
+     *
+     * @param bank  the bank
+     * @param input the input
+     */
+    public CreateCard(final Bank bank, final CommandInput input) {
         this.bank = bank;
         this.input = input;
     }

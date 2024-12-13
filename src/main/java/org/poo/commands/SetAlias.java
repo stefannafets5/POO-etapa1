@@ -3,11 +3,20 @@ package org.poo.commands;
 import org.poo.bank.Bank;
 import org.poo.fileio.CommandInput;
 
-public class SetAlias implements Command{
+/**
+ * The type Set alias.
+ */
+public final class SetAlias implements Command {
     private Bank bank;
     private CommandInput input;
 
-    public SetAlias(Bank bank, CommandInput input) {
+    /**
+     * Instantiates a new Set alias.
+     *
+     * @param bank  the bank
+     * @param input the input
+     */
+    public SetAlias(final Bank bank, final CommandInput input) {
         this.input = input;
         this.bank = bank;
     }

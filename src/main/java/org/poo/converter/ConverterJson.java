@@ -3,26 +3,39 @@ package org.poo.converter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.poo.bank.Bank;
 import org.poo.fileio.CommandInput;
+import org.poo.bank.Bank;
 import org.poo.users.User;
 import org.poo.users.Account;
 import org.poo.users.Card;
 import org.poo.users.transactions.CardPayment;
-import org.poo.users.transactions.SplitPaymentFailed;
 import org.poo.users.transactions.Transaction;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 
+/**
+ * The type Converter json.
+ */
 public class ConverterJson {
     private final ArrayNode out;
 
+    /**
+     * Instantiates a new Converter json.
+     *
+     * @param output the output
+     */
     public ConverterJson(final ArrayNode output) {
         this.out = output;
     }
 
-    public void printUsers(Bank bank, int timestamp){
+    /**
+     * Print users.
+     *
+     * @param bank      the bank
+     * @param timestamp the timestamp
+     */
+    public void printUsers(final Bank bank, final int timestamp) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
 
@@ -62,11 +75,16 @@ public class ConverterJson {
             userList.add(txt2);
         }
         txt.set("output", userList);
-        txt.put("timestamp",timestamp);
+        txt.put("timestamp", timestamp);
         out.add(txt);
     }
 
-    public void deleteAccount(int timestamp){
+    /**
+     * Delete account.
+     *
+     * @param timestamp the timestamp
+     */
+    public void deleteAccount(final int timestamp) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
 
@@ -81,7 +99,12 @@ public class ConverterJson {
         out.add(txt);
     }
 
-    public void deleteAccountFail(int timestamp){
+    /**
+     * Delete account fail.
+     *
+     * @param timestamp the timestamp
+     */
+    public void deleteAccountFail(final int timestamp) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
 
@@ -95,7 +118,14 @@ public class ConverterJson {
         out.add(txt);
     }
 
-    public void printError(int timestamp, String command, String error){
+    /**
+     * Print error.
+     *
+     * @param timestamp the timestamp
+     * @param command   the command
+     * @param error     the error
+     */
+    public void printError(final int timestamp, final String command, final String error) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
 
@@ -110,7 +140,13 @@ public class ConverterJson {
         out.add(txt);
     }
 
-    public void printTransactions(ArrayList<Transaction> transactions, int timestamp){
+    /**
+     * Print transactions.
+     *
+     * @param transactions the transactions
+     * @param timestamp    the timestamp
+     */
+    public void printTransactions(final ArrayList<Transaction> transactions, final int timestamp) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
 
@@ -126,21 +162,31 @@ public class ConverterJson {
         out.add(txt);
     }
 
-    public void createReport(ArrayList<Transaction> transactions,
-                             CommandInput input, Account account, String type){
+    /**
+     * Create report.
+     *
+     * @param transactions the transactions
+     * @param input        the input
+     * @param account      the account
+     * @param type         the type
+     */
+    public void createReport(final ArrayList<Transaction> transactions,
+                             final CommandInput input, final Account account, final String type) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
 
-        if (type.equals("normal"))
+        if (type.equals("normal")) {
             txt.put("command", "report");
-        else txt.put("command", "spendingsReport");
+        } else {
+            txt.put("command", "spendingsReport");
+        }
 
         ObjectNode txt2 = mapper.createObjectNode();
         txt2.put("IBAN", account.getIban());
         txt2.put("balance", account.getBalance());
         txt2.put("currency", account.getCurrency());
         ArrayNode transactionList = mapper.createArrayNode();
-        for (Transaction transaction : transactions)
+        for (Transaction transaction : transactions) {
             if (transaction.getTimestamp() >= input.getStartTimestamp()
                     && transaction.getTimestamp() <= input.getEndTimestamp()) {
                 if (transaction.getFromIban().equals(" ")
@@ -149,31 +195,34 @@ public class ConverterJson {
                         transactionList.add(transaction.toJson(mapper));
                     } else if (transaction.getDescription().equals("Card payment")) {
                         CardPayment pay = (CardPayment) transaction;
-                        if (pay.getIban().equals(account.getIban()))
+                        if (pay.getIban().equals(account.getIban())) {
                             transactionList.add(transaction.toJson(mapper));
+                        }
                     }
                 }
             }
+        }
 
         txt2.set("transactions", transactionList);
 
-        if (type.equals("spendings")){
+        if (type.equals("spendings")) {
             ArrayList<CardPayment> cardPayments = new ArrayList<>();
-            for (Transaction transaction : transactions)
-                if (transaction.getTimestamp() >= input.getStartTimestamp() &&
-                        transaction.getTimestamp() <= input.getEndTimestamp() &&
-                        transaction.getDescription().equals("Card payment")) {
+            for (Transaction transaction : transactions) {
+                if (transaction.getTimestamp() >= input.getStartTimestamp()
+                        && transaction.getTimestamp() <= input.getEndTimestamp()
+                        && transaction.getDescription().equals("Card payment")) {
                     cardPayments.add((CardPayment) transaction);
                 }
+            }
             cardPayments.sort(Comparator.comparing(CardPayment::getCommerciant));
 
             ArrayNode commerciantsList = mapper.createArrayNode();
             for (CardPayment pay : cardPayments) {
-                if (pay.getTimestamp() >= input.getStartTimestamp() &&
-                        pay.getTimestamp() <= input.getEndTimestamp() &&
-                        pay.getIban().equals(account.getIban())) {
+                if (pay.getTimestamp() >= input.getStartTimestamp()
+                        && pay.getTimestamp() <= input.getEndTimestamp()
+                        && pay.getIban().equals(account.getIban())) {
                     ObjectNode txt3 = mapper.createObjectNode();
-                    txt3.put("commerciant", pay.getCommerciant() != null ? pay.getCommerciant() : "Unknown");
+                    txt3.put("commerciant", pay.getCommerciant());
                     txt3.put("total", pay.getAmount());
                     commerciantsList.add(txt3);
                 }
@@ -186,15 +235,20 @@ public class ConverterJson {
         out.add(txt);
     }
 
-    public void spendingsReportError(int timestamp){
+    /**
+     * Spendings report error.
+     *
+     * @param timestamp the timestamp
+     */
+    public void spendingsReportError(final int timestamp) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
 
         txt.put("command", "spendingsReport");
 
         ObjectNode txt2 = mapper.createObjectNode();
-        txt2.put("error", "This kind of report is " +
-                    "not supported for a saving account");
+        txt2.put("error", "This kind of report is "
+                + "not supported for a saving account");
 
         txt.set("output", txt2);
         txt.put("timestamp", timestamp);

@@ -3,12 +3,22 @@ package org.poo.commands;
 import org.poo.converter.ConverterJson;
 import org.poo.bank.Bank;
 
-public class PrintUsers implements Command {
+/**
+ * The type Print users.
+ */
+public final class PrintUsers implements Command {
     private Bank bank;
     private ConverterJson out;
     private int timestamp;
 
-    public PrintUsers(Bank bank, ConverterJson out, int timestamp) {
+    /**
+     * Instantiates a new Print users.
+     *
+     * @param bank      the bank
+     * @param out       the out
+     * @param timestamp the timestamp
+     */
+    public PrintUsers(final Bank bank, final ConverterJson out, final int timestamp) {
         this.bank = bank;
         this.out = out;
         this.timestamp = timestamp;

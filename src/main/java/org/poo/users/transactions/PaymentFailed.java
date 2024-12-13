@@ -3,14 +3,22 @@ package org.poo.users.transactions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class PaymentFailed extends Transaction {
+/**
+ * The type Payment failed.
+ */
+public final class PaymentFailed extends Transaction {
 
-    public PaymentFailed(int timestamp) {
+    /**
+     * Instantiates a new Payment failed.
+     *
+     * @param timestamp the timestamp
+     */
+    public PaymentFailed(final int timestamp) {
         super(timestamp, "Insufficient funds");
     }
 
     @Override
-    public ObjectNode toJson(ObjectMapper mapper) {
+    public ObjectNode toJson(final ObjectMapper mapper) {
         ObjectNode txt = mapper.createObjectNode();
         txt.put("timestamp", getTimestamp());
         txt.put("description", getDescription());

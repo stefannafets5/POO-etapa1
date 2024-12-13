@@ -4,12 +4,22 @@ import org.poo.bank.Bank;
 import org.poo.fileio.CommandInput;
 import org.poo.converter.ConverterJson;
 
-public class DeleteAccount implements Command {
+/**
+ * The type Delete account.
+ */
+public final class DeleteAccount implements Command {
     private CommandInput input;
     private Bank bank;
     private ConverterJson out;
 
-    public DeleteAccount(Bank bank, CommandInput input, ConverterJson out) {
+    /**
+     * Instantiates a new Delete account.
+     *
+     * @param bank  the bank
+     * @param input the input
+     * @param out   the out
+     */
+    public DeleteAccount(final Bank bank, final CommandInput input, final ConverterJson out) {
         this.input = input;
         this.bank = bank;
         this.out = out;

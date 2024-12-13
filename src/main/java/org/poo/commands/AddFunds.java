@@ -3,11 +3,20 @@ package org.poo.commands;
 import org.poo.bank.Bank;
 import org.poo.fileio.CommandInput;
 
-public class AddFunds implements Command{
+/**
+ * The type Add funds.
+ */
+public final class AddFunds implements Command {
     private Bank bank;
     private CommandInput input;
 
-    public AddFunds(Bank bank, CommandInput input) {
+    /**
+     * Instantiates a new Add funds.
+     *
+     * @param bank  the bank
+     * @param input the input
+     */
+    public AddFunds(final Bank bank, final CommandInput input) {
         this.bank = bank;
         this.input = input;
     }

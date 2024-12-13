@@ -3,11 +3,20 @@ package org.poo.commands;
 import org.poo.bank.Bank;
 import org.poo.fileio.CommandInput;
 
-public class SetMinimumBalance implements Command{
+/**
+ * The type Set minimum balance.
+ */
+public final class SetMinimumBalance implements Command {
     private Bank bank;
     private CommandInput input;
 
-    public SetMinimumBalance(Bank bank, CommandInput input) {
+    /**
+     * Instantiates a new Set minimum balance.
+     *
+     * @param bank  the bank
+     * @param input the input
+     */
+    public SetMinimumBalance(final Bank bank, final CommandInput input) {
         this.input = input;
         this.bank = bank;
     }

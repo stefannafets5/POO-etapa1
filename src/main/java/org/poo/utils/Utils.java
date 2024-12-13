@@ -2,6 +2,9 @@ package org.poo.utils;
 
 import java.util.Random;
 
+/**
+ * The type Utils.
+ */
 public final class Utils {
     private Utils() {
         // Checkstyle error free constructor

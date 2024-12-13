@@ -3,13 +3,21 @@ package org.poo.converter;
 import org.poo.bank.ExchangeRate;
 import org.poo.fileio.ObjectInput;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
 
-public class CurrencyConverter {
+
+/**
+ * The type Currency converter.
+ */
+public final class CurrencyConverter {
     private static CurrencyConverter instance;
-    private final ArrayList<ExchangeRate> exchangeRates= new ArrayList<>();
+    private final ArrayList<ExchangeRate> exchangeRates = new ArrayList<>();
 
-    private CurrencyConverter(ObjectInput input) {
+    private CurrencyConverter(final ObjectInput input) {
         for (int i = 0; i < input.getExchangeRates().length; i++) { // initialize exchange rates
             this.exchangeRates.add(new ExchangeRate(input.getExchangeRates()[i].getFrom(),
                     input.getExchangeRates()[i].getTo(),
@@ -17,18 +25,35 @@ public class CurrencyConverter {
         }
     }
 
-    public static CurrencyConverter getInstance(ObjectInput input) {
+    /**
+     * Gets instance.
+     *
+     * @param input the input
+     * @return the instance
+     */
+    public static CurrencyConverter getInstance(final ObjectInput input) {
         if (instance == null) {
             instance = new CurrencyConverter(input);
         }
         return instance;
     }
 
+    /**
+     * Reset instance.
+     */
     public static void resetInstance() {
         instance = null;
     }
 
-    public double convert(double amount, String from, String to) {
+    /**
+     * Convert double.
+     *
+     * @param amount the amount
+     * @param from   the from
+     * @param to     the to
+     * @return the double
+     */
+    public double convert(final double amount, final String from, final String to) {
         if (from.equals(to)) {
             return amount;
         }
@@ -48,7 +73,7 @@ public class CurrencyConverter {
         return result;
     }
 
-    private double indirectConversion(double amount, String from, String to) {
+    private double indirectConversion(final double amount, final String from, final String to) {
         Map<String, Map<String, Double>> graph = buildExchangeGraph();
 
         Queue<String> queue = new LinkedList<>();

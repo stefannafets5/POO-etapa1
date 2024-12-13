@@ -6,53 +6,112 @@ import org.poo.utils.Utils;
 
 import java.util.ArrayList;
 
+/**
+ * The type Card.
+ */
 public class Card {
     private String status;
     private String cardNumber;
     private String type;
-    private int timestamp; /// probabil nu e nevoie de asta
+    private int timestamp;
 
-    public Card(int timestamp, String type) {
+    /**
+     * probabil nu e nevoie de asta @param timestamp the timestamp
+     *
+     * @param type the type
+     */
+
+    public Card(final int timestamp, final String type) {
         this.status = "active";
         this.timestamp = timestamp;
         this.cardNumber = Utils.generateCardNumber();
         this.type = type;
     }
 
+    /**
+     * Gets status.
+     *
+     * @return the status
+     */
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    /**
+     * Sets status.
+     *
+     * @param status the status
+     */
+    public void setStatus(final String status) {
         this.status = status;
     }
 
+    /**
+     * Gets card number.
+     *
+     * @return the card number
+     */
     public String getCardNumber() {
         return cardNumber;
     }
 
-    public void setCardNumber(String cardNumber) {
+    /**
+     * Sets card number.
+     *
+     * @param cardNumber the card number
+     */
+    public void setCardNumber(final String cardNumber) {
         this.cardNumber = cardNumber;
     }
 
+    /**
+     * Gets timestamp.
+     *
+     * @return the timestamp
+     */
     public int getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(int timestamp) {
+    /**
+     * Sets timestamp.
+     *
+     * @param timestamp the timestamp
+     */
+    public void setTimestamp(final int timestamp) {
         this.timestamp = timestamp;
     }
 
+    /**
+     * Gets type.
+     *
+     * @return the type
+     */
     public String getType() {
         return type;
     }
 
-    public void setType(String type) {
+    /**
+     * Sets type.
+     *
+     * @param type the type
+     */
+    public void setType(final String type) {
         this.type = type;
     }
 
-    public void addCardCreationTransaction (int timestamp, String email, String iban,
-                                            ArrayList<Transaction> transactions, String description) {
-        transactions.add(new CreateOrDeleteCard(timestamp, email, getCardNumber(), iban, description));
+    /**
+     * Add card creation transaction.
+     *
+     * @param time    the timestamp
+     * @param email        the email
+     * @param iban         the iban
+     * @param transactions the transactions
+     * @param description  the description
+     */
+    public void addCardCreationTransaction(final int time, final String email, final String iban,
+                                           final ArrayList<Transaction> transactions,
+                                           final String description) {
+        transactions.add(new CreateOrDeleteCard(time, email, getCardNumber(), iban, description));
     }
 }
