@@ -18,10 +18,10 @@ public final class CurrencyConverter {
     private final ArrayList<ExchangeRate> exchangeRates = new ArrayList<>();
 
     private CurrencyConverter(final ObjectInput input) {
-        for (int i = 0; i < input.getExchangeRates().length; i++) { // initialize exchange rates
+        for (int i = 0; i < input.getExchangeRates().length; i++) {
             this.exchangeRates.add(new ExchangeRate(input.getExchangeRates()[i].getFrom(),
-                    input.getExchangeRates()[i].getTo(),
-                    input.getExchangeRates()[i].getRate()));
+                                                    input.getExchangeRates()[i].getTo(),
+                                                    input.getExchangeRates()[i].getRate()));
         }
     }
 
@@ -68,7 +68,7 @@ public final class CurrencyConverter {
         // indirect conversion
         double result = indirectConversion(amount, from, to);
         if (result == -1) {
-            System.out.println("Nu e posibila conversia intre " + from + " si " + to);
+            System.out.println("Conversion between " + from + " and " + to + " is not possible");
         }
         return result;
     }
@@ -83,7 +83,7 @@ public final class CurrencyConverter {
         queue.add(from);
 
         while (!queue.isEmpty()) {
-            String current = queue.poll(); // first elem
+            String current = queue.poll();
 
             if (current.equals(to)) { // found currency
                 return amount * visited.get(current);
@@ -112,9 +112,9 @@ public final class CurrencyConverter {
             String to = rate.getTo();
             double rateVal = rate.getRate();
 
-            // direct conversion
+            // normal conversion
             graph.computeIfAbsent(from, k -> new HashMap<>()).put(to, rateVal);
-            // indirect conversion
+            // reverse conversion
             graph.computeIfAbsent(to, k -> new HashMap<>()).put(from, 1.0 / rateVal);
         }
         return graph;

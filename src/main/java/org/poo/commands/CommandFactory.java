@@ -4,13 +4,18 @@ import org.poo.bank.Bank;
 import org.poo.converter.ConverterJson;
 import org.poo.fileio.CommandInput;
 
+/**
+ * The type Command factory.
+ */
 public class CommandFactory {
+
     /**
+     * Create command.
      *
-     * @param bank
-     * @param input
-     * @param out
-     * @return
+     * @param bank  the bank
+     * @param input the input
+     * @param out   the out
+     * @return the command
      */
     public static Command createCommand(final Bank bank, final CommandInput input,
                                         final ConverterJson out) {

@@ -13,17 +13,14 @@ public class Card {
     private String status;
     private String cardNumber;
     private String type;
-    private int timestamp;
 
     /**
-     * probabil nu e nevoie de asta @param timestamp the timestamp
      *
      * @param type the type
      */
 
-    public Card(final int timestamp, final String type) {
+    public Card(final String type) {
         this.status = "active";
-        this.timestamp = timestamp;
         this.cardNumber = Utils.generateCardNumber();
         this.type = type;
     }
@@ -62,24 +59,6 @@ public class Card {
      */
     public void setCardNumber(final String cardNumber) {
         this.cardNumber = cardNumber;
-    }
-
-    /**
-     * Gets timestamp.
-     *
-     * @return the timestamp
-     */
-    public int getTimestamp() {
-        return timestamp;
-    }
-
-    /**
-     * Sets timestamp.
-     *
-     * @param timestamp the timestamp
-     */
-    public void setTimestamp(final int timestamp) {
-        this.timestamp = timestamp;
     }
 
     /**

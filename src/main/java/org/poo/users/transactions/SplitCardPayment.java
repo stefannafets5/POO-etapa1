@@ -10,7 +10,7 @@ import java.util.ArrayList;
  */
 public final class SplitCardPayment extends Transaction {
     private double amount;
-    private double splitAmmount;
+    private double splitAmount;
     private String currency;
     private ArrayList<String> ibanList;
 
@@ -19,19 +19,19 @@ public final class SplitCardPayment extends Transaction {
      *
      * @param timestamp    the timestamp
      * @param amount       the amount
-     * @param splitAmmount the split ammount
+     * @param splitAmount the split amount
      * @param currency     the currency
      * @param ibanList     the iban list
      */
-    public SplitCardPayment(final int timestamp, final double amount, final double splitAmmount,
+    public SplitCardPayment(final int timestamp, final double amount, final double splitAmount,
                             final String currency, final ArrayList<String> ibanList) {
-        super(timestamp, "Split payment of " + splitAmmount + "0 " + currency);
+        super(timestamp, "Split payment of " + splitAmount + "0 " + currency);
         this.amount = amount;
         this.currency = currency;
         this.ibanList = ibanList;
-        this.splitAmmount = splitAmmount;
-        if (splitAmmount % 1 != 0) {
-            this.setDescription("Split payment of " + splitAmmount + " " + currency);
+        this.splitAmount = splitAmount;
+        if (splitAmount % 1 != 0) {
+            this.setDescription("Split payment of " + splitAmount + " " + currency);
         }
     }
 
@@ -90,21 +90,21 @@ public final class SplitCardPayment extends Transaction {
     }
 
     /**
-     * Gets split ammount.
+     * Gets split amount.
      *
-     * @return the split ammount
+     * @return the split amount
      */
-    public double getSplitAmmount() {
-        return splitAmmount;
+    public double getSplitAmount() {
+        return splitAmount;
     }
 
     /**
-     * Sets split ammount.
+     * Sets split amount.
      *
-     * @param splitAmmount the split ammount
+     * @param splitAmount the split amount
      */
-    public void setSplitAmmount(final double splitAmmount) {
-        this.splitAmmount = splitAmmount;
+    public void setSplitAmount(final double splitAmount) {
+        this.splitAmount = splitAmount;
     }
 
     @Override
@@ -112,7 +112,7 @@ public final class SplitCardPayment extends Transaction {
         ObjectNode txt = mapper.createObjectNode();
         txt.put("timestamp", getTimestamp());
         txt.put("description", getDescription());
-        txt.put("amount", getSplitAmmount() / getIbanList().size());
+        txt.put("amount", getSplitAmount() / getIbanList().size());
         txt.put("currency", getCurrency());
         txt.putPOJO("involvedAccounts", getIbanList());
         return txt;

@@ -38,7 +38,7 @@ public final class Bank {
     }
 
     private Bank(final ObjectInput input) {
-        for (int i = 0; i < input.getUsers().length; i++) { // initialize users
+        for (int i = 0; i < input.getUsers().length; i++) {
             this.users.add(new User(input.getUsers()[i].getFirstName(),
                     input.getUsers()[i].getLastName(),
                     input.getUsers()[i].getEmail()));
@@ -372,7 +372,7 @@ public final class Bank {
         int receiverExists = 0;
         int hasMoney = 1;
         int found = 0;
-        String from = "RON"; // initialization but never used like this
+        String from = "RON"; // initialization but always  modifies before use
 
         for (User user : users) {
             for (Account currentAccount : user.getAccounts()) {

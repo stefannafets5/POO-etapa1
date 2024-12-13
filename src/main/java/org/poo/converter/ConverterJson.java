@@ -17,7 +17,8 @@ import java.util.Comparator;
 /**
  * The type Converter json.
  */
-public class ConverterJson {
+public final class ConverterJson {
+    private static ConverterJson instance;
     private final ArrayNode out;
 
     /**
@@ -25,8 +26,28 @@ public class ConverterJson {
      *
      * @param output the output
      */
-    public ConverterJson(final ArrayNode output) {
+    private ConverterJson(final ArrayNode output) {
         this.out = output;
+    }
+
+    /**
+     * Gets instance.
+     *
+     * @param out the out
+     * @return the instance
+     */
+    public static ConverterJson getInstance(final ArrayNode out) {
+        if (instance == null) {
+            instance = new ConverterJson(out);
+        }
+        return instance;
+    }
+
+    /**
+     * Reset instance.
+     */
+    public static void resetInstance() {
+        instance = null;
     }
 
     /**
@@ -42,7 +63,7 @@ public class ConverterJson {
         txt.put("command", "printUsers");
 
         ArrayNode userList = mapper.createArrayNode();
-        for (User user : bank.getUsers()) { // output
+        for (User user : bank.getUsers()) {
             ObjectNode txt2 = mapper.createObjectNode();
             txt2.put("firstName", user.getFirstName());
             txt2.put("lastName", user.getLastName());

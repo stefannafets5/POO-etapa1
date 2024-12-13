@@ -227,14 +227,14 @@ public class User {
      *
      * @param timestamp    the timestamp
      * @param amount       the amount
-     * @param splitAmmount the split ammount
+     * @param splitAmount the split amount
      * @param currency     the currency
      * @param ibanList     the iban list
      */
     public void addSplitCardPaymentTransaction(final int timestamp, final double amount,
-                                                final double splitAmmount, final String currency,
+                                                final double splitAmount, final String currency,
                                                 final ArrayList<String> ibanList) {
         getTransactions().add(new SplitCardPayment(timestamp, amount,
-                              splitAmmount, currency, ibanList));
+                              splitAmount, currency, ibanList));
     }
 }

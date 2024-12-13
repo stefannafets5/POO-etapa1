@@ -83,7 +83,7 @@ public final class Main {
         ObjectInput inputData = objectMapper.readValue(file, ObjectInput.class);
 
         ArrayNode output = objectMapper.createArrayNode();
-        ConverterJson out = new ConverterJson(output);
+        ConverterJson out = ConverterJson.getInstance(output);
         Bank bank = Bank.getInstance(inputData);
 
         for (CommandInput input : inputData.getCommands()) {
@@ -94,6 +94,7 @@ public final class Main {
         Utils.resetRandom();
         Bank.resetInstance();
         CurrencyConverter.resetInstance();
+        ConverterJson.resetInstance();
 
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
         objectWriter.writeValue(new File(filePath2), output);

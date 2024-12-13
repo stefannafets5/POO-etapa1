@@ -185,7 +185,7 @@ public class Account {
      */
     public void addCard(final CommandInput input, final String cardType,
                          final ArrayList<Transaction> transactions, final String description) {
-        Card card = new Card(input.getTimestamp(), cardType);
+        Card card = new Card(cardType);
 
         card.addCardCreationTransaction(input.getTimestamp(),
                 input.getEmail(), getIban(), transactions, description);
